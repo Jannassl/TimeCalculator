@@ -1,36 +1,35 @@
 pipeline {
     agent any
+
     tools {
-        maven 'Maven3' // This should match the name of the Maven installation in Jenkins
+        maven 'Maven'
     }
+
+    environment {
+        DOCKERHUB_CREDENTIALS_ID = 'DockerGithub'
+        DOCKERHUB_REPO = 'jannassl/timecalculator'
+        DOCKER_IMAGE_TAG = 'latest'
+    }
+
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'master', url: 'https://github.com/Jannassl/TimeCalculator.git', credentialsId: 'JenkinsGithub'
-            }
-        }
-        stage('Build') {
-            steps {
-                bat 'mvn clean install'
-            }
-        }
-        stage('Test') {
-            steps {
-                bat 'mvn test'
-            }
-            post {
-                success {
-                    // Publish JUnit test results
-                    junit '**/target/surefire-reports/TEST-*.xml'
-                    // Generate JaCoCo code coverage report
-                    jacoco(execPattern: '**/target/jacoco.exec')
-                }
+                git 'https://github.com/jannassl/TimeCalculator.git'
             }
         }
         stage('Build Docker Image') {
             steps {
                 script {
-                    def dockerImage = docker.build("jannassl/timecalculator:${env.BUILD_ID}")
+                    docker.build("${DOCKERHUB_REPO}:${DOCKER_IMAGE_TAG}")
+                }
+            }
+        }
+        stage('Push Docker Image to Docker Hub') {
+            steps {
+                script {
+                    docker.withRegistry('https://index.docker.io/v1/', DOCKERHUB_CREDENTIALS_ID) {
+                        docker.image("${DOCKERHUB_REPO}:${DOCKER_IMAGE_TAG}").push()
+                    }
                 }
             }
         }
