@@ -6,7 +6,7 @@ pipeline {
     }
 
     environment {
-        DOCKERHUB_CREDENTIALS_ID = 'DockerGithub'
+        DOCKERHUB_CREDENTIALS_ID = 'DockerTunnus'
         DOCKERHUB_REPO = 'jannassl/timecalculator'
         DOCKER_IMAGE_TAG = 'latest'
     }
