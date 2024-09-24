@@ -14,7 +14,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git 'https://github.com/jannassl/TimeCalculator.git'
+                git 'https://github.com/Jannassl/TimeCalculator.git'
             }
         }
         stage('Build Docker Image') {
